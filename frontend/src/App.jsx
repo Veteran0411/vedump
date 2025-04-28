@@ -25,7 +25,8 @@ function App() {
     });
 
     try {
-      const res = await fetch('/api/upload', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch(`${baseURL}/api/upload`, {
         method: 'POST',
         body: formData,
       });

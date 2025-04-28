@@ -5,11 +5,13 @@ function FileList() {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const baseURL = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                const response = await fetch('/api/files');
+                
+                const response = await fetch(`${baseURL}/api/files`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch files');
                 }
@@ -40,7 +42,7 @@ function FileList() {
     // Add this function to your component
 const handleDownload = async (filename) => {
     try {
-      const response = await fetch(`/api/download/${filename}`);
+      const response = await fetch(`${baseURL}/api/download/${filename}`);
       if (!response.ok) throw new Error('Download failed');
       
       const blob = await response.blob();
