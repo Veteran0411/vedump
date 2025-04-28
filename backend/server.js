@@ -28,11 +28,31 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // API Routes (must come before static files)
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  res.json({
-    filename: req.file.filename,
-    path: `/uploads/${req.file.filename}`
-  });
+// app.post('/api/upload', upload.single('file'), (req, res) => {
+//   res.json({
+//     filename: req.file.filename,
+//     path: `/uploads/${req.file.filename}`
+//   });
+// });
+
+// Change from upload.single to upload.array and update the route
+app.post('/api/upload', upload.array('files'), (req, res) => {
+  try {
+    const uploadedFiles = req.files.map(file => ({
+      filename: file.filename,
+      path: `/uploads/${file.filename}`,
+      size: file.size,
+      uploaded: new Date()
+    }));
+    
+    res.json({
+      message: 'Upload successful',
+      count: uploadedFiles.length,
+      files: uploadedFiles
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Upload failed', details: error.message });
+  }
 });
 
 // Serve uploaded files

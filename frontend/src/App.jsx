@@ -3,17 +3,26 @@ import FileList from './components/FileList';
 import './App.css';
 
 function App() {
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
 
+  const handleFileChange = (e) => {
+    // For both single file and folder selection
+    setFiles(Array.from(e.target.files));
+  };
+
   const handleUpload = async () => {
-    if (!file) {
-      setMessage('Please select a file first!');
+    if (files.length === 0) {
+      setMessage('Please select file(s) or folder first!');
       return;
     }
 
     const formData = new FormData();
-    formData.append('file', file);
+    
+    // Append all files
+    files.forEach(file => {
+      formData.append('files', file);
+    });
 
     try {
       const res = await fetch('/api/upload', {
@@ -21,8 +30,7 @@ function App() {
         body: formData,
       });
       const data = await res.json();
-      setMessage(`File uploaded successfully!`);
-      // The FileList component will automatically refresh
+      setMessage(`Upload successful! ${data.count} file(s) uploaded`);
     } catch (err) {
       setMessage('Upload failed: ' + err.message);
     }
@@ -33,7 +41,13 @@ function App() {
       <h1>Simple Cloud Storage</h1>
       
       <div className="upload-section">
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <input 
+          type="file" 
+          onChange={handleFileChange}
+          webkitdirectory="true"  // Enable folder selection
+          directory="true"        // Fallback
+          multiple                // Allow multiple files
+        />
         <button onClick={handleUpload}>Upload</button>
         {message && <p className="message">{message}</p>}
       </div>
